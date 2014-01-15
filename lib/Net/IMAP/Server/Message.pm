@@ -383,6 +383,12 @@ sub fetch {
 
     my @out;
     for my $part (@parts) {
+
+        # Deliberately return wrong response; testcase for bug #1053465
+        if ( uc $part eq "RFC822.HEADER" ) {
+            $part = "BODY[HEADER]";
+        }
+
         push @out, \( uc $part );
 
         # Now that we've split out the right tag, do some aliasing
