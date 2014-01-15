@@ -137,14 +137,16 @@ sub parse_options {
     return $self->_parsed_options
         if not defined $str and not defined $self->options_str;
 
+    my $options_str = defined $str ? $str : $self->options_str;
     my @parsed;
-    for my $term (
-        grep {/\S/}
-        split
-        /($RE{delimited}{-delim=>'"'}{-esc=>'\\'}|$RE{balanced}{-parens=>'()'}|\S+$RE{balanced}{-parens=>'()[]<>'}|\S+)/,
-        defined $str ? $str : $self->options_str
+    while (
+        my @cap = $options_str =~
+        /($RE{delimited}{-delim=>'"'}{-esc=>'\\'}|$RE{balanced}{-parens=>'()'}|\S+$RE{balanced}{-parens=>'()[]<>'}|\S+)(.*)/
         )
     {
+        my $term = $1;
+        $options_str = pop @cap;
+
         if ( $term =~ /^$RE{delimited}{-delim=>'"'}{-esc=>'\\'}{-keep}$/ ) {
             my $value = $3;
             $value =~ s/\\([\\"])/$1/g;
